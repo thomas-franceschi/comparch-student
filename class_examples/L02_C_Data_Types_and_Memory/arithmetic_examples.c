@@ -10,7 +10,7 @@
 int main()
 {
     /*
-     * Number conversion
+     * Number formatting
      */
     printf("==== 8-bit\n");
     printf("hex: %1$hhx \tunsigned: %1$hhu \tsigned: %1$hhd\n", -1);
