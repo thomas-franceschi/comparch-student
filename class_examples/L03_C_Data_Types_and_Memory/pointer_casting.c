@@ -15,5 +15,5 @@ int main()
 
     printf("*int_ptr     = %x\n",   *int_ptr);
     printf("*char_ptr    = %hhx\n", *char_ptr);
-    printf(" char_ptr[3] = %hhx\n",   char_ptr[3]);
+    printf(" char_ptr[3] = %hhx\n",  char_ptr[3]);
 }
