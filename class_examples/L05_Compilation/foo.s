@@ -1,25 +1,18 @@
+	.cpu cortex-a57+fp+simd+crypto+crc
 	.file	"foo.c"
 	.text
-	.globl	foo
-	.type	foo, @function
+	.align	2
+	.global	foo
+	.type	foo, %function
 foo:
-.LFB0:
-	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	%edi, -4(%rbp)
-	movl	%esi, -8(%rbp)
-	movl	-4(%rbp), %edx
-	movl	-8(%rbp), %eax
-	addl	%edx, %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	sub	sp, sp, #16
+	str	w0, [sp,12]
+	str	w1, [sp,8]
+	ldr	w1, [sp,12]
+	ldr	w0, [sp,8]
+	add	w0, w1, w0
+	add	sp, sp, 16
 	ret
-	.cfi_endproc
-.LFE0:
 	.size	foo, .-foo
-	.ident	"GCC: (GNU) 4.9.2"
-	.section	.note.GNU-stack,"",@progbits
+	.ident	"GCC: (Sourcery CodeBench Lite 2014.11-95) 4.9.1"
+	.section	.note.GNU-stack,"",%progbits
