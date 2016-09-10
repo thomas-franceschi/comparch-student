@@ -9,8 +9,8 @@ main:
 # int i = 0;
         addi $s0, $0, 0         # i = 0
 # while (i < 10) {
-        slti $t0, $s0, 10       # t0 = (i < 10)
 loop_cond:
+        slti $t0, $s0, 10       # t0 = (i < 10)
         beq  $t0, $0, sequel    # _if (!t0) goto sequel
         nop
 #     i = i + 1;

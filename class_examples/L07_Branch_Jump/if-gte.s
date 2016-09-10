@@ -1,4 +1,4 @@
-# if-lte.s
+# if-gte.s
     .set noreorder
     .data
 
@@ -6,10 +6,10 @@
     .globl main
     .ent main
 main:
-        addi $s0, $0, 2         # x = 2
-        addi $s1, $0, 1         # y = 1
-# if (x <= y)
-        slt $t0, $s1, $s0       # t0 = !(x <= y) = (y < x)
+        addi $s0, $0, 1         # x = 1
+        addi $s1, $0, 2         # y = 2
+# if (x >= y)
+        slt $t0, $s0, $s1       # t0 = !(x >= y) = (x < y)
         bne $t0, $0, sequel     # if (t0) goto sequel
         nop
 #    p = 5;
