@@ -467,6 +467,9 @@ void MemStage::eval() {
         case 11:
             printf("%c", ex_mem.writeData.q);
             break;
+        case 20:
+            printf("0x%1$x (%1$d)\n", ex_mem.writeData.q);
+            break;
         default:
             assert(false && "illegal SYSCALL code");
         }
