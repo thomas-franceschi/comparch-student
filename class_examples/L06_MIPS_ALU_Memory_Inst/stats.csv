@@ -1,14 +1,14 @@
-instructionCount,22
+instructionCount,19
 NONE,0
-ALU,8
-SHIFT,3
+ALU,6
+SHIFT,5
 LOAD,2
-STORE,4
+STORE,2
 BRANCH,0
-JUMP,1
-OTHER,4
+JUMP,2
+OTHER,2
 NONE,0
-sll,3
+sll,5
 srl,0
 sra,0
 sllv,0
@@ -26,7 +26,7 @@ nor,0
 slt,0
 sltu,0
 j,0
-jal,1
+jal,2
 jalr,0
 mult,0
 multu,0
@@ -42,14 +42,14 @@ bgez,0
 bgtz,0
 blez,0
 bltz,0
-addi,4
+addi,0
 addiu,0
 slti,0
 sltiu,0
 andi,0
 ori,4
 xori,0
-lui,0
+lui,2
 lb,0
 lh,0
 lw,2
@@ -57,8 +57,8 @@ lbu,0
 lhu,0
 sb,0
 sh,0
-sw,4
-syscall,4
+sw,2
+syscall,2
 break,0
 loadStalls, 0
 controlStalls, 0

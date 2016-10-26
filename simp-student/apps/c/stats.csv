@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 instructionCount,13467
 NONE,0
 ALU,3133
@@ -11,19 +12,42 @@ NONE,0
 sll,3938
 srl,0
 sra,26
+=======
+instructionCount,9234
+NONE,0
+ALU,2279
+SHIFT,2346
+LOAD,1636
+STORE,1425
+BRANCH,660
+JUMP,834
+OTHER,54
+NONE,0
+sll,2175
+srl,0
+sra,171
+>>>>>>> 9817dd977bc23dc27e2149e10242b1e7bb651d58
 sllv,0
 srlv,0
 srav,0
 jr,305
 add,0
+<<<<<<< HEAD
 addu,26
+=======
+addu,544
+>>>>>>> 9817dd977bc23dc27e2149e10242b1e7bb651d58
 sub,0
 subu,0
 and,0
 or,1232
 xor,0
 nor,0
+<<<<<<< HEAD
 slt,147
+=======
+slt,186
+>>>>>>> 9817dd977bc23dc27e2149e10242b1e7bb651d58
 sltu,0
 j,0
 jal,305
@@ -43,8 +67,13 @@ bgtz,52
 blez,0
 bltz,0
 addi,0
+<<<<<<< HEAD
 addiu,1203
 slti,79
+=======
+addiu,1100
+slti,52
+>>>>>>> 9817dd977bc23dc27e2149e10242b1e7bb651d58
 sltiu,0
 andi,52
 ori,54
