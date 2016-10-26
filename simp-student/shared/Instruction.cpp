@@ -25,6 +25,7 @@
 #include <iomanip>
 
 unsigned Instruction::instructionCount;
+unsigned Instruction::nopCount;
 unsigned Instruction::itokenCounts[NUM_ITOKEN];
 unsigned Instruction::xtypeCounts[NUM_XTYPE];
 
@@ -410,6 +411,8 @@ Instruction::Instruction(unsigned machineCode)
   ++instructionCount;
   ++itokenCounts[token];
   ++xtypeCounts[xtype];
+  if (machineCode == 0)
+      ++nopCount;
 }
 
 /*

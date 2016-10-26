@@ -187,6 +187,7 @@ void Pipeline::outputStats() {
   for (int i = 0;  i < NUM_ITOKEN;  i++) {
     statFile << Instruction::ITokenName[i] << "," << Instruction::itokenCounts[i] << endl;
   }
+  statFile << "nopCount, " << Instruction::nopCount << endl;
   statFile << "loadStalls, " << loadStalls << endl;
   statFile << "controlStalls, " << controlStalls << endl;
   float iCacheMissRate = 1 - ((float) iCache.hits/iCache.accesses);

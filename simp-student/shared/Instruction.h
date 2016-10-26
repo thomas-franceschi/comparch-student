@@ -64,6 +64,7 @@ public:
     bool        memToReg;
 
     static unsigned instructionCount;
+    static unsigned nopCount;
     static unsigned itokenCounts[];
     static unsigned xtypeCounts[];
     static const char* ITokenName[];

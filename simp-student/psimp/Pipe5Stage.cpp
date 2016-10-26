@@ -49,29 +49,18 @@ void IdStage::eval() {
         regData2 = reg[if_id.ir.q->rt];
     }
     /*
-     * Forwarding Level 1: This is what is handed out to students
+     * Forwarding Level 1: P&H COAD forwarding exclusive of branch support
      *   - load-use stall
      *   - register file bypass from WB stage only
      */
     else if (Pipeline::forwardingLevel == 1) {
-        // look for branch/jump/syscall stall
-        // stall condition:
-        //   branch/jr/jalr/syscall instruction in this stage AND
-        //   (EX stage has an instruction that writes to rs or rt OR
-        //    MEM stage has an instruction that reads memory to rs or rt)
-        if (if_id.ir.q->xtype == BRANCH || iToken == JR || iToken == JALR || iToken == SYSCALL) {
-
-            // Not implemented
-
-        }
-
         // look for load/use stall
         // stall condition:
         //   load is in EX stage AND
         //   destReg of instruction in EX stage matches rs or rt
         if (id_ex.ir.q->memToReg
                 && (   if_id.ir.q->rs == id_ex.ir.q->regDest
-                        || if_id.ir.q->rs == id_ex.ir.q->regDest)) {
+                        || if_id.ir.q->rt == id_ex.ir.q->regDest)) {
             if (Pipeline::verbose) {
                 cout << "\tLOAD-USE STALL" << endl;
             }
@@ -82,10 +71,30 @@ void IdStage::eval() {
             return;
         }
 
-        // forward values to branch compare unit and to EX stage
+        // forward values from WB stage to bypass register file
         // forwarding for rs/regData1
+        if (if_id.ir.q->rs != 0 &&
+                if_id.ir.q->rs == mem_wb.ir.q->regDest &&
+                mem_wb.ir.q->regWrite ) {
+            regData1 = mem_wb.wbData.q;
+            if (Pipeline::verbose) {
+                cout << "\tforward regData1 from MEM_WB" << endl;
+            }
+        }
+        else
+            regData1 = reg[if_id.ir.q->rs];
 
-        // Not implemented
+        //forwarding for rt/regData2
+        if (if_id.ir.q->rt != 0 &&
+                if_id.ir.q->rt == mem_wb.ir.q->regDest &&
+                mem_wb.ir.q->regWrite ) {
+            regData2 = mem_wb.wbData.q;
+            if (Pipeline::verbose) {
+                cout << "\tforward regData2 from MEM_WB" << endl;
+            }
+        }
+        else
+            regData2 = reg[if_id.ir.q->rt];
     }
     /*
      * Forwarding Level 2:  Full forwarding
@@ -93,16 +102,27 @@ void IdStage::eval() {
      *   - load/use stall
      *   - forwarding to branch compare and EX stage
      */
-    else if (Pipeline::forwardingLevel == 2) {  // partial forwarding for assignment
+    else if (Pipeline::forwardingLevel == 2) {
         // look for branch/jump/syscall stall
         // stall condition:
         //   branch/jr/jalr/syscall instruction in this stage AND
         //   (EX stage has an instruction that writes to rs or rt OR
         //    MEM stage has an instruction that reads memory to rs or rt)
-        if (if_id.ir.q->xtype == BRANCH || iToken == JR || iToken == JALR || iToken == SYSCALL) {
-
-            // Insert code here
-
+        if ((if_id.ir.q->xtype == BRANCH || iToken == JR || iToken == JALR || iToken == SYSCALL)
+                && (   (id_ex.ir.q->regWrite
+                        && (   (if_id.ir.q->rs != 0 && if_id.ir.q->rs == id_ex.ir.q->regDest)
+                                || (if_id.ir.q->rt != 0 && if_id.ir.q->rt == id_ex.ir.q->regDest)))
+                        || (ex_mem.ir.q->memToReg
+                                && (   (if_id.ir.q->rs != 0 && if_id.ir.q->rs == ex_mem.ir.q->regDest)
+                                        || (if_id.ir.q->rt != 0 && if_id.ir.q->rt == ex_mem.ir.q->regDest))))) {
+            if (Pipeline::verbose) {
+                cout << "\tCONTROL STALL" << endl;  // needs to inhibit pipeline from advancing
+            }
+            pc.stall();
+            if_id.ir.stall();
+            ++Pipeline::controlStalls;
+            id_ex.ir.d = new Instruction(0);
+            return;
         }
 
         // look for load/use stall
@@ -111,7 +131,7 @@ void IdStage::eval() {
         //   destReg of instruction in EX stage matches rs or rt
         if (id_ex.ir.q->memToReg
                 && (   if_id.ir.q->rs == id_ex.ir.q->regDest
-                        || if_id.ir.q->rs == id_ex.ir.q->regDest)) {
+                        || if_id.ir.q->rt == id_ex.ir.q->regDest)) {
             if (Pipeline::verbose) {
                 cout << "\tLOAD-USE STALL" << endl;
             }
@@ -122,10 +142,46 @@ void IdStage::eval() {
             return;
         }
 
-        // forward values to branch compare unit and to EX stage
+        // forward values to bypass register file
         // forwarding for rs/regData1
+        if (if_id.ir.q->rs != 0 &&
+                if_id.ir.q->rs == ex_mem.ir.q->regDest &&
+                ex_mem.ir.q->regWrite ) {
+            regData1 = ex_mem.aluOut.q;
+            if (Pipeline::verbose) {
+                cout << "\tforward regData1 from EX_MEM" << endl;
+            }
+        }
+        else if (if_id.ir.q->rs != 0 &&
+                if_id.ir.q->rs == mem_wb.ir.q->regDest &&
+                mem_wb.ir.q->regWrite ) {
+            regData1 = mem_wb.wbData.q;
+            if (Pipeline::verbose) {
+                cout << "\tforward regData1 from MEM_WB" << endl;
+            }
+        }
+        else
+            regData1 = reg[if_id.ir.q->rs];
 
-        // Insert code here
+        //forwarding for rt/regData2
+        if (if_id.ir.q->rt != 0 &&
+                if_id.ir.q->rt == ex_mem.ir.q->regDest &&
+                ex_mem.ir.q->regWrite ) {
+            regData2 = ex_mem.aluOut.q;
+            if (Pipeline::verbose) {
+                cout << "\tforward regData2 from EX_MEM" << endl;
+            }
+        }
+        else if (if_id.ir.q->rt != 0 &&
+                if_id.ir.q->rt == mem_wb.ir.q->regDest &&
+                mem_wb.ir.q->regWrite ) {
+            regData2 = mem_wb.wbData.q;
+            if (Pipeline::verbose) {
+                cout << "\tforward regData2 from MEM_WB" << endl;
+            }
+        }
+        else
+            regData2 = reg[if_id.ir.q->rt];
     }
     /*
      * Undefined Forwarding Level
@@ -237,31 +293,53 @@ void ExStage::eval() {
         regData2 = id_ex.regData2.q;
     }
     /*
-     * Forwarding Level 1:  Handed out to students
-     *   - no forwarding
-     */
-    else if (Pipeline::forwardingLevel == 1) {
-        regData1 = id_ex.regData1.q;
-        regData2 = id_ex.regData2.q;
-    }
-    /*
-     * Forwarding Level 2: Complete forwarding
+     * Forwarding Level 1 or 2: Complete forwarding
      *   -forwarding from MEM stage
      *   -forwarding from WB stage
      */
-    else if (Pipeline::forwardingLevel == 2) {
+    else if (Pipeline::forwardingLevel == 1 || Pipeline::forwardingLevel == 2) {
         // check for forwarded ALU inputs
         // regData1 forwarding
-        //
-        // Not implemented, replace the 2 lines below with your code
-        //
-        regData1 = id_ex.regData1.q;
+        if (id_ex.ir.q->rs != 0 &&
+                id_ex.ir.q->rs == ex_mem.ir.q->regDest &&
+                ex_mem.ir.q->regWrite) {
+            regData1 = ex_mem.aluOut.q;
+            if (Pipeline::verbose) {
+                cout << "\n\tforward regData1 from EX_MEM";
+            }
+        }
+        else if (id_ex.ir.q->rs != 0 &&
+                id_ex.ir.q->rs == mem_wb.ir.q->regDest &&
+                mem_wb.ir.q->regWrite) {
+            regData1 = mem_wb.wbData.q;
+            if (Pipeline::verbose) {
+                cout << "\n\tforward regData1 from MEM_WB";
+            }
+        }
+        else {
+            regData1 = id_ex.regData1.q;
+        }
 
         // regData2 forwarding
-        //
-        // Not implemented, replace the 2 lines below with your code
-        //
-        regData2 = id_ex.regData2.q;
+        if (id_ex.ir.q->rt != 0 &&
+                id_ex.ir.q->rt == ex_mem.ir.q->regDest &&
+                ex_mem.ir.q->regWrite) {
+            regData2 = ex_mem.aluOut.q;
+            if (Pipeline::verbose) {
+                cout << "\n\tforward regData2 from EX_MEM";
+            }
+        }
+        else if (id_ex.ir.q->rt != 0 &&
+                id_ex.ir.q->rt == mem_wb.ir.q->regDest &&
+                mem_wb.ir.q->regWrite) {
+            regData2 = mem_wb.wbData.q;
+            if (Pipeline::verbose) {
+                cout << "\n\tforward regData2 from MEM_WB";
+            }
+        }
+        else {
+            regData2 = id_ex.regData2.q;
+        }
     }
     /*
      * Undefined Forwarding Level
